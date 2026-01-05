@@ -2,16 +2,18 @@
 Unit tests for model training and prediction.
 """
 
+import sys
+from pathlib import Path
+
+# Add project root to path before other imports
+PROJECT_ROOT = Path(__file__).parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import pytest
 import pandas as pd
 import numpy as np
-import sys
-from pathlib import Path
 from unittest.mock import patch, MagicMock
-
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models.load_model import ModelLoader, load_best_model
 from src.data.preprocessing import HeartDiseasePreprocessor, prepare_features_target

@@ -50,7 +50,15 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
       
+      - name: Install package in editable mode
+        working-directory: ${{ github.workspace }}
+        run: |
+          pip install -e .
+      
       - name: Run unit tests
+        working-directory: ${{ github.workspace }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml
       
