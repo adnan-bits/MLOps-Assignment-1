@@ -78,6 +78,75 @@ python src/models/load_model.py
 python scripts/reproduce_training.py
 ```
 
+### 9. Run API Locally (Phase 6)
+```bash
+# Start the FastAPI server
+python scripts/run_api_local.py
+
+# Or use uvicorn directly
+uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will be available at:
+- API: http://localhost:8000
+- Interactive Docs: http://localhost:8000/docs
+- Health Check: http://localhost:8000/health
+
+### 10. Install Docker (Required for Phase 6)
+
+**If Docker is not installed**, install it first:
+
+- **macOS**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop) or use `brew install --cask docker`
+- **Linux (Ubuntu/Debian)**: `sudo apt-get install docker.io && sudo systemctl start docker`
+- **Linux (CentOS/RHEL)**: `sudo yum install docker && sudo systemctl start docker`
+- **Windows**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+Verify installation:
+```bash
+docker --version
+docker info
+```
+
+### 11. Build and Run Docker Container (Phase 6)
+
+**📖 Quick Start Guide**: See [docs/PHASE6_QUICKSTART.md](docs/PHASE6_QUICKSTART.md) for step-by-step instructions.
+```bash
+# Build Docker image
+docker build -t heart-disease-api:latest .
+
+# Run container
+docker run -d -p 8000:8000 --name heart-disease-api heart-disease-api:latest
+
+# Test the containerized API
+bash docker/test_api.sh
+
+# Or use the automated script (checks for Docker automatically)
+bash scripts/build_and_test_docker.sh
+
+# View logs
+docker logs heart-disease-api
+
+# Stop container
+docker stop heart-disease-api
+docker rm heart-disease-api
+```
+
+**Note**: The `build_and_test_docker.sh` script will check if Docker is installed and provide installation instructions if it's missing.
+
+### 12. Test API Endpoints
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Single prediction
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d @test_request.json
+
+# Model info
+curl http://localhost:8000/model/info
+```
+
 ## Dataset
 
 Heart Disease UCI Dataset from UCI Machine Learning Repository
@@ -89,11 +158,12 @@ Heart Disease UCI Dataset from UCI Machine Learning Repository
 - ✅ Data preprocessing and EDA
 - ✅ Multiple ML models (Logistic Regression, Random Forest)
 - ✅ MLflow experiment tracking
-- ✅ **Model packaging and reproducibility** (Phase 4)
+- ✅ Model packaging and reproducibility (Phase 4)
 - ✅ CI/CD pipeline with GitHub Actions
-- ✅ Docker containerization
-- ✅ Kubernetes deployment
-- ✅ Monitoring and logging
+- ✅ **FastAPI REST API for model serving** (Phase 6)
+- ✅ **Docker containerization** (Phase 6)
+- ⏳ Kubernetes deployment (Phase 7)
+- ⏳ Monitoring and logging (Phase 8)
 
 ## License
 
