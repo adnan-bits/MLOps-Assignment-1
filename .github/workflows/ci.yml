@@ -50,6 +50,51 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
       
+      - name: Verify source structure
+        run: |
+          echo "Checking source structure..."
+          echo "Current directory: $(pwd)"
+          echo "Workspace: ${{ github.workspace }}"
+          echo ""
+          echo "Git tracked files in src/models:"
+          git ls-files src/models/ || echo "No files tracked in src/models/"
+          echo ""
+          echo "Checking src/ directory:"
+          if [ -d "src" ]; then
+            echo "✓ src/ exists"
+            ls -la src/ || echo "Cannot list src/"
+            echo ""
+            echo "Checking src/models/:"
+            if [ -d "src/models" ]; then
+              echo "✓ src/models/ directory exists"
+              ls -la src/models/ || echo "Cannot list src/models/"
+              if [ ! -f "src/models/load_model.py" ]; then
+                echo "✗ WARNING: src/models/load_model.py not found!"
+                echo "Files in src/models/:"
+                find src/models -type f || echo "No files found"
+              fi
+            else
+              echo "✗ src/models/ directory does not exist!"
+              echo "This is a critical error - the directory must exist."
+              echo "Please ensure src/models/ files are committed to git."
+              exit 1
+            fi
+            echo ""
+            echo "Checking src/data/:"
+            if [ -d "src/data" ]; then
+              echo "✓ src/data/ directory exists"
+              ls -la src/data/ || echo "Cannot list src/data/"
+            else
+              echo "✗ src/data/ directory does not exist!"
+            fi
+            echo ""
+            echo "All Python files in src/:"
+            find src -name "*.py" -type f || echo "No Python files found"
+          else
+            echo "✗ src/ directory does not exist!"
+            exit 1
+          fi
+      
       - name: Install package in editable mode
         run: |
           pip install -e . || echo "Editable install failed, will use PYTHONPATH"

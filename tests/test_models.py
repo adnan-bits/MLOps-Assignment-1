@@ -30,12 +30,35 @@ except ImportError as e:
     print(f"PROJECT_ROOT: {PROJECT_ROOT}")
     print(f"PROJECT_ROOT exists: {PROJECT_ROOT.exists()}")
     print(f"sys.path (first 5): {sys.path[:5]}")
-    if (PROJECT_ROOT / "src").exists():
-        print(f"✓ src directory exists")
-        print(f"✓ src/models exists: {(PROJECT_ROOT / 'src' / 'models').exists()}")
-        print(f"✓ src/data exists: {(PROJECT_ROOT / 'src' / 'data').exists()}")
+    
+    # Check directory and file existence
+    src_dir = PROJECT_ROOT / "src"
+    models_dir = src_dir / "models"
+    data_dir = src_dir / "data"
+    load_model_file = models_dir / "load_model.py"
+    
+    print(f"src directory exists: {src_dir.exists()}")
+    print(f"src/models directory exists: {models_dir.exists()}")
+    print(f"src/models/load_model.py exists: {load_model_file.exists()}")
+    print(f"src/data directory exists: {data_dir.exists()}")
+    
+    # Check for specific files (check files, not just directories)
+    if load_model_file.exists():
+        model_files = list(models_dir.glob("*.py"))
+        print(f"✓ Files in src/models: {[f.name for f in model_files]}")
     else:
-        print(f"✗ src directory NOT found at {PROJECT_ROOT / 'src'}")
+        print(f"✗ src/models/load_model.py NOT found at {load_model_file}")
+        # Try to list what's in src/
+        if src_dir.exists():
+            print(f"Contents of src/: {[p.name for p in src_dir.iterdir()]}")
+        # Check if models_dir exists as a file (shouldn't happen but check)
+        if models_dir.exists() and models_dir.is_file():
+            print(f"⚠️  src/models exists but is a FILE, not a directory!")
+    
+    if data_dir.exists():
+        data_files = list(data_dir.glob("*.py"))
+        print(f"✓ Files in src/data: {[f.name for f in data_files]}")
+    
     print(f"{'='*60}\n")
     raise
 
