@@ -51,12 +51,16 @@ jobs:
           pip install pytest pytest-cov
       
       - name: Install package in editable mode
-        working-directory: ${{ github.workspace }}
         run: |
-          pip install -e .
+          pip install -e . || echo "Editable install failed, will use PYTHONPATH"
+      
+      - name: Verify package installation
+        run: |
+          python -c "import src; print('✓ src module found')" || echo "✗ src module not found"
+          python -c "from src.models.load_model import ModelLoader; print('✓ src.models.load_model found')" || echo "✗ src.models.load_model not found"
+          python -c "from src.data.preprocessing import HeartDiseasePreprocessor; print('✓ src.data.preprocessing found')" || echo "✗ src.data.preprocessing not found"
       
       - name: Run unit tests
-        working-directory: ${{ github.workspace }}
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |

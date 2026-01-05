@@ -7,16 +7,38 @@ from pathlib import Path
 
 # Add project root to path before other imports
 PROJECT_ROOT = Path(__file__).parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+project_root_str = str(PROJECT_ROOT)
+if project_root_str not in sys.path:
+    sys.path.insert(0, project_root_str)
 
 import pytest
 import pandas as pd
 import numpy as np
 from unittest.mock import patch, MagicMock
 
-from src.models.load_model import ModelLoader, load_best_model
-from src.data.preprocessing import HeartDiseasePreprocessor, prepare_features_target
+# Try to import with helpful error message if it fails
+try:
+    from src.models.load_model import ModelLoader, load_best_model
+    from src.data.preprocessing import HeartDiseasePreprocessor, prepare_features_target
+except ImportError as e:
+    # If import fails, print debug info for CI troubleshooting
+    import os
+    print(f"\n{'='*60}")
+    print(f"Import Error: {e}")
+    print(f"{'='*60}")
+    print(f"Current directory: {os.getcwd()}")
+    print(f"PROJECT_ROOT: {PROJECT_ROOT}")
+    print(f"PROJECT_ROOT exists: {PROJECT_ROOT.exists()}")
+    print(f"sys.path (first 5): {sys.path[:5]}")
+    if (PROJECT_ROOT / "src").exists():
+        print(f"✓ src directory exists")
+        print(f"✓ src/models exists: {(PROJECT_ROOT / 'src' / 'models').exists()}")
+        print(f"✓ src/data exists: {(PROJECT_ROOT / 'src' / 'data').exists()}")
+    else:
+        print(f"✗ src directory NOT found at {PROJECT_ROOT / 'src'}")
+    print(f"{'='*60}\n")
+    raise
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
