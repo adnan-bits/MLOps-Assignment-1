@@ -45,7 +45,6 @@ data/processed/*.csv
 !data/processed/.gitkeep
 
 # Model files
-models/
 *.pkl
 *.joblib
 *.h5
