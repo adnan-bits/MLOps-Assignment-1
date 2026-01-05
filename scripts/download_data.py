@@ -4,8 +4,6 @@ Data download script for Heart Disease UCI Dataset.
 This script downloads the dataset from UCI ML Repository or uses local data.
 """
 
-import os
-import shutil
 import pandas as pd
 from pathlib import Path
 
@@ -53,7 +51,7 @@ def load_local_data():
     }
     
     all_dataframes = []
-    
+
     for name, file_path in data_files.items():
         if file_path.exists():
             print(f"Loading {name} data from {file_path}...")
@@ -111,4 +109,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

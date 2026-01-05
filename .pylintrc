@@ -1,0 +1,31 @@
+[MASTER]
+# Python code to execute, usually for sys.path manipulation
+init-hook='import sys; sys.path.append(".")'
+
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=
+    C0103,  # invalid-name
+    C0111,  # missing-docstring
+    R0903,  # too-few-public-methods
+    R0913,  # too-many-arguments
+    R0914,  # too-many-local-variables (common in ML training functions)
+    C0413,  # wrong-import-position (needed for sys.path manipulation)
+    C0415,  # import-outside-toplevel (some imports are conditional)
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+[BASIC]
+# Good variable names
+good-names=i,j,k,ex,Run,_,df,X,y
+
+[DESIGN]
+# Maximum number of arguments
+max-args=10
+# Maximum number of attributes
+max-attributes=15
+# Maximum number of public methods
+max-public-methods=20
+

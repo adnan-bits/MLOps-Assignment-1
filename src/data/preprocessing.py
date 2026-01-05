@@ -4,12 +4,13 @@ Data preprocessing pipeline for Heart Disease dataset.
 This module provides reusable transformers and preprocessing functions.
 """
 
+import pickle
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
-import pickle
-from pathlib import Path
 
 
 class HeartDiseasePreprocessor:
@@ -100,7 +101,10 @@ def clean_data(df):
     df_clean = df_clean.replace([-9.0, -9, '?'], np.nan)
     
     # Ensure numeric columns are numeric
-    numeric_cols = df_clean.columns.drop('target') if 'target' in df_clean.columns else df_clean.columns
+    if 'target' in df_clean.columns:
+        numeric_cols = df_clean.columns.drop('target')
+    else:
+        numeric_cols = df_clean.columns
     for col in numeric_cols:
         df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
     

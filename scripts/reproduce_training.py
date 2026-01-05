@@ -22,15 +22,16 @@ sys.path.append(str(PROJECT_ROOT))
 # Set random seeds for reproducibility
 RANDOM_SEED = 42
 
+
 def set_random_seeds(seed=RANDOM_SEED):
     """Set all random seeds for reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
-    
+
     # Set sklearn random state (will be used in training scripts)
     import os
     os.environ['PYTHONHASHSEED'] = str(seed)
-    
+
     print(f"Random seeds set to: {seed}")
 
 
@@ -39,20 +40,20 @@ def main():
     print("=" * 60)
     print("Reproduce Training - Full Reproducibility")
     print("=" * 60)
-    
+
     # Set random seeds
     set_random_seeds(RANDOM_SEED)
-    
+
     # Import after setting seeds
     from src.models.train import main as train_main
-    
+
     print("\nStarting model training with fixed random seed...")
     print(f"Random seed: {RANDOM_SEED}")
     print("-" * 60)
-    
+
     # Run training
     results, preprocessor, summary = train_main()
-    
+
     print("\n" + "=" * 60)
     print("Training Reproduced Successfully!")
     print("=" * 60)
@@ -63,5 +64,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
