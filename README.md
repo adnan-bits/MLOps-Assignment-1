@@ -66,6 +66,18 @@ Or use MLflow tracking:
 python src/models/train_with_mlflow.py
 ```
 
+### 8. Load and Test Models (Phase 4)
+```bash
+# Test model inference
+python scripts/test_model_inference.py
+
+# Load model for predictions
+python src/models/load_model.py
+
+# Reproduce training (with fixed random seeds)
+python scripts/reproduce_training.py
+```
+
 ## Dataset
 
 Heart Disease UCI Dataset from UCI Machine Learning Repository
@@ -77,7 +89,7 @@ Heart Disease UCI Dataset from UCI Machine Learning Repository
 - ✅ Data preprocessing and EDA
 - ✅ Multiple ML models (Logistic Regression, Random Forest)
 - ✅ MLflow experiment tracking
-- ✅ Model packaging and reproducibility
+- ✅ **Model packaging and reproducibility** (Phase 4)
 - ✅ CI/CD pipeline with GitHub Actions
 - ✅ Docker containerization
 - ✅ Kubernetes deployment
