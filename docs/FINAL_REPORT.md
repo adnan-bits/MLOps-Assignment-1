@@ -8,7 +8,10 @@ This project implements an end-to-end MLOps solution for predicting heart diseas
 
 All 9 phases have been successfully implemented and documented.
 
----
+### Project Links
+
+- **GitHub Repository**: [https://github.com/adnan-bits/MLOps-Assignment-1](https://github.com/adnan-bits/MLOps-Assignment-1)
+- **Demo Recording**: [https://drive.google.com/drive/folders/1wrRR4hgS15sWjnaP7Rl1xN1ORNiDLjrP?usp=sharing](https://drive.google.com/drive/folders/1wrRR4hgS15sWjnaP7Rl1xN1ORNiDLjrP?usp=sharing)
 
 ## Project Overview
 
@@ -450,13 +453,13 @@ The solution is:
 
 ## References
 
+### Project Resources
+- **GitHub Repository**: [https://github.com/adnan-bits/MLOps-Assignment-1](https://github.com/adnan-bits/MLOps-Assignment-1)
+- **Demo Recording**: [https://drive.google.com/drive/folders/1wrRR4hgS15sWjnaP7Rl1xN1ORNiDLjrP?usp=sharing](https://drive.google.com/drive/folders/1wrRR4hgS15sWjnaP7Rl1xN1ORNiDLjrP?usp=sharing)
+
+### Documentation
 - [Project README](../README.md)
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
 - [User Guide](USER_GUIDE.md)
 - [Phase Summaries](PHASE4_SUMMARY.md, PHASE5_SUMMARY.md, etc.)
-
----
-
-**Project Completion Date**: January 2024  
-**Status**: ✅ **COMPLETE**
 
