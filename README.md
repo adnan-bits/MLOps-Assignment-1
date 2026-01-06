@@ -240,6 +240,22 @@ Heart Disease UCI Dataset from UCI Machine Learning Repository
 - ✅ **Kubernetes deployment** (Phase 7)
 - ✅ **Monitoring and logging** (Phase 8) - Prometheus metrics, structured logging
 
+## Documentation
+
+### Quick Links
+- 📖 [Final Project Report](docs/FINAL_REPORT.md) - Complete project overview
+- 🚀 [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - End-to-end deployment instructions
+- 📚 [User Guide](docs/USER_GUIDE.md) - API usage and examples
+- 📋 [Phase Summaries](docs/) - Detailed phase documentation
+
+### Phase Documentation
+- [Phase 4: Model Packaging](docs/PHASE4_SUMMARY.md)
+- [Phase 5: Testing & CI/CD](docs/PHASE5_SUMMARY.md)
+- [Phase 6: Containerization](docs/PHASE6_SUMMARY.md)
+- [Phase 7: Kubernetes](docs/PHASE7_SUMMARY.md)
+- [Phase 8: Monitoring](docs/PHASE8_SUMMARY.md)
+- [Phase 9: Documentation](docs/PHASE9_SUMMARY.md)
+
 ## License
 
 This project is for educational purposes.
