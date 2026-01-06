@@ -147,14 +147,48 @@ curl -X POST http://localhost:8000/predict \
 curl http://localhost:8000/model/info
 ```
 
-### 13. Deploy to Kubernetes (Phase 7)
+### 13. Set Up Kubernetes Cluster (Required for Phase 7)
+
+**If you don't have a Kubernetes cluster**, set one up first:
+
+**Quick Setup (Automated):**
+```bash
+bash scripts/setup_local_k8s.sh
+```
+
+**Manual Setup Options:**
+
+1. **minikube** (Recommended):
+   ```bash
+   brew install minikube kubectl
+   minikube start
+   ```
+
+2. **kind** (Kubernetes in Docker):
+   ```bash
+   brew install kind kubectl
+   kind create cluster --name mlops
+   ```
+
+3. **Docker Desktop** (macOS/Windows):
+   - Open Docker Desktop → Settings → Kubernetes → Enable
+
+**📖 Detailed Setup Guide**: See [docs/KUBERNETES_SETUP.md](docs/KUBERNETES_SETUP.md)
+
+**Verify cluster:**
+```bash
+kubectl cluster-info
+kubectl get nodes
+```
+
+### 14. Deploy to Kubernetes (Phase 7)
 
 **📖 Kubernetes Guide**: See [k8s/README.md](k8s/README.md) and [docs/PHASE7_KUBERNETES.md](docs/PHASE7_KUBERNETES.md) for detailed instructions.
 
 **Prerequisites:**
-- Kubernetes cluster (minikube, kind, or cloud cluster)
-- kubectl installed and configured
-- Docker image built
+- ✅ Kubernetes cluster set up (see step 13)
+- ✅ kubectl installed and configured
+- ✅ Docker image built
 
 **Quick Deploy:**
 ```bash
