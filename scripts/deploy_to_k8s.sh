@@ -100,28 +100,111 @@ cd "${K8S_DIR}"
 
 # Apply resources in order
 echo "Creating namespace..."
-kubectl apply -f namespace.yaml
+kubectl apply -f namespace.yaml || {
+    echo -e "${RED}Failed to create namespace${NC}"
+    exit 1
+}
+
+# Wait for namespace to be ready
+sleep 1
 
 echo "Creating PVC..."
-kubectl apply -f pvc.yaml
+PVC_CREATED=false
+if kubectl apply -f pvc.yaml 2>/dev/null; then
+    PVC_CREATED=true
+    echo "PVC created successfully"
+else
+    echo -e "${YELLOW}Warning: PVC creation failed or already exists${NC}"
+    # Check if PVC exists
+    if kubectl get pvc heart-disease-models-pvc -n mlops > /dev/null 2>&1; then
+        PVC_CREATED=true
+        echo "PVC already exists"
+    fi
+fi
+
+# Determine which deployment file to use
+USE_PVC=false
+if [ "$PVC_CREATED" = true ] && kubectl get pvc heart-disease-models-pvc -n mlops > /dev/null 2>&1; then
+    PVC_STATUS=$(kubectl get pvc heart-disease-models-pvc -n mlops -o jsonpath='{.status.phase}' 2>/dev/null || echo "Pending")
+    if [ "$PVC_STATUS" = "Bound" ]; then
+        USE_PVC=true
+        echo "PVC is bound, using deployment with PVC"
+    else
+        echo -e "${YELLOW}PVC exists but not bound yet. Using deployment without PVC...${NC}"
+    fi
+else
+    echo "Using deployment without PVC (models in image)"
+fi
 
 echo "Creating ConfigMap..."
-kubectl apply -f configmap.yaml
+kubectl apply -f configmap.yaml || {
+    echo -e "${RED}Failed to create ConfigMap${NC}"
+    exit 1
+}
 
 echo "Creating Deployment..."
-kubectl apply -f deployment.yaml
+if [ "$USE_PVC" = true ]; then
+    echo "Using deployment with PVC..."
+    DEPLOYMENT_FILE="deployment.yaml"
+else
+    echo "Using deployment without PVC (models in image)..."
+    DEPLOYMENT_FILE="deployment-no-pvc.yaml"
+fi
+
+if [ ! -f "$DEPLOYMENT_FILE" ]; then
+    echo -e "${RED}Error: Deployment file '$DEPLOYMENT_FILE' not found${NC}"
+    exit 1
+fi
+
+DEPLOYMENT_OUTPUT=$(kubectl apply -f "$DEPLOYMENT_FILE" 2>&1)
+DEPLOYMENT_EXIT_CODE=$?
+
+if [ $DEPLOYMENT_EXIT_CODE -ne 0 ]; then
+    echo -e "${RED}Failed to create deployment${NC}"
+    echo "$DEPLOYMENT_OUTPUT"
+    echo ""
+    echo "Common issues:"
+    echo "1. Image not found - Ensure image is built and available in cluster"
+    echo "2. PVC not found - If using deployment.yaml, ensure PVC exists"
+    echo ""
+    echo "Checking deployment status..."
+    kubectl get deployment -n mlops
+    kubectl get pods -n mlops
+    exit 1
+else
+    echo "$DEPLOYMENT_OUTPUT"
+fi
 
 echo "Creating Service..."
-kubectl apply -f service.yaml
+kubectl apply -f service.yaml || {
+    echo -e "${RED}Failed to create service${NC}"
+    exit 1
+}
+
+# Wait a moment for deployment to be registered
+sleep 2
+
+# Check if deployment exists
+if ! kubectl get deployment heart-disease-api -n mlops > /dev/null 2>&1; then
+    echo -e "${RED}Error: Deployment 'heart-disease-api' not found in namespace 'mlops'${NC}"
+    echo ""
+    echo "Checking what was created:"
+    kubectl get all -n mlops
+    echo ""
+    echo "Checking for errors:"
+    kubectl get events -n mlops --sort-by='.lastTimestamp' | tail -10
+    exit 1
+fi
 
 # Wait for deployment
 echo ""
 echo "Waiting for deployment to be ready..."
-kubectl wait --for=condition=available --timeout=300s deployment/heart-disease-api -n mlops || {
-    echo -e "${RED}Deployment failed to become ready${NC}"
-    echo "Check pod status: kubectl get pods -n mlops"
-    exit 1
-}
+if kubectl wait --for=condition=available --timeout=300s deployment/heart-disease-api -n mlops 2>/dev/null; then
+    echo -e "${GREEN}✓ Deployment is ready${NC}"
+else
+    echo -e "${YELLOW}Warning: Deployment not ready yet, but continuing...${NC}"
+    echo "Check status with: kubectl get pods -n mlops"
+fi
 
 echo -e "${GREEN}✓ Deployment is ready${NC}"
 
