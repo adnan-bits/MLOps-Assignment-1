@@ -147,6 +147,47 @@ curl -X POST http://localhost:8000/predict \
 curl http://localhost:8000/model/info
 ```
 
+### 13. Deploy to Kubernetes (Phase 7)
+
+**📖 Kubernetes Guide**: See [k8s/README.md](k8s/README.md) and [docs/PHASE7_KUBERNETES.md](docs/PHASE7_KUBERNETES.md) for detailed instructions.
+
+**Prerequisites:**
+- Kubernetes cluster (minikube, kind, or cloud cluster)
+- kubectl installed and configured
+- Docker image built
+
+**Quick Deploy:**
+```bash
+# Automated deployment
+bash scripts/deploy_to_k8s.sh
+
+# Or manually
+cd k8s
+kubectl apply -f namespace.yaml
+kubectl apply -f pvc.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+**Access the API:**
+```bash
+# Port forward
+kubectl port-forward service/heart-disease-api-service 8000:80 -n mlops
+
+# Check status
+kubectl get pods -n mlops
+kubectl get services -n mlops
+
+# View logs
+kubectl logs -f deployment/heart-disease-api -n mlops
+```
+
+**Cleanup:**
+```bash
+bash scripts/undeploy_from_k8s.sh
+```
+
 ## Dataset
 
 Heart Disease UCI Dataset from UCI Machine Learning Repository
@@ -162,7 +203,7 @@ Heart Disease UCI Dataset from UCI Machine Learning Repository
 - ✅ CI/CD pipeline with GitHub Actions
 - ✅ **FastAPI REST API for model serving** (Phase 6)
 - ✅ **Docker containerization** (Phase 6)
-- ⏳ Kubernetes deployment (Phase 7)
+- ✅ **Kubernetes deployment** (Phase 7)
 - ⏳ Monitoring and logging (Phase 8)
 
 ## License

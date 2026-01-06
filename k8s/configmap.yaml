@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heart-disease-api-config
+  labels:
+    app: heart-disease-api
+data:
+  # API Configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  LOG_LEVEL: "INFO"
+  
+  # Model Configuration
+  MODEL_DIR: "/app/models"
+  DEFAULT_MODEL: "random_forest"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_INTERVAL: "30"
+  HEALTH_CHECK_TIMEOUT: "5"
+
