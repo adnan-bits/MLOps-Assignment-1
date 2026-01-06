@@ -238,7 +238,7 @@ Heart Disease UCI Dataset from UCI Machine Learning Repository
 - ✅ **FastAPI REST API for model serving** (Phase 6)
 - ✅ **Docker containerization** (Phase 6)
 - ✅ **Kubernetes deployment** (Phase 7)
-- ⏳ Monitoring and logging (Phase 8)
+- ✅ **Monitoring and logging** (Phase 8) - Prometheus metrics, structured logging
 
 ## License
 

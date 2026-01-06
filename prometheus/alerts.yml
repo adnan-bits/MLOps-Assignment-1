@@ -1,0 +1,56 @@
+# Prometheus alert rules for Heart Disease API
+
+groups:
+- name: heart_disease_api_alerts
+  interval: 30s
+  rules:
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{status_code=~"5.."}[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: warning
+      service: heart-disease-api
+    annotations:
+      summary: "High error rate detected in Heart Disease API"
+      description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+  - alert: ModelNotLoaded
+    expr: model_loaded == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: heart-disease-api
+    annotations:
+      summary: "Model is not loaded"
+      description: "The Heart Disease prediction model is not loaded. API cannot serve predictions."
+
+  - alert: HighLatency
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0
+    for: 5m
+    labels:
+      severity: warning
+      service: heart-disease-api
+    annotations:
+      summary: "High request latency detected"
+      description: "P95 latency is {{ $value }}s, exceeding 1.0s threshold"
+
+  - alert: HighRequestRate
+    expr: rate(http_requests_total[5m]) > 100
+    for: 5m
+    labels:
+      severity: info
+      service: heart-disease-api
+    annotations:
+      summary: "High request rate"
+      description: "Request rate is {{ $value }} requests/second"
+
+  - alert: ServiceDown
+    expr: up{job="heart-disease-api"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: heart-disease-api
+    annotations:
+      summary: "Heart Disease API is down"
+      description: "The Heart Disease API service is not responding to metrics scraping"
+

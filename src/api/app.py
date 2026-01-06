@@ -5,6 +5,7 @@ Provides REST API endpoints for model inference.
 """
 
 import sys
+import os
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -14,18 +15,26 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response, JSONResponse
 from pydantic import BaseModel, Field, validator
 import numpy as np
 
 from src.models.load_model import load_best_model
 from src.data.preprocessing import get_feature_names
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+from src.api.monitoring import (
+    MetricsMiddleware,
+    record_prediction,
+    update_model_status,
+    get_metrics,
+    setup_logging,
+    CONTENT_TYPE_LATEST
 )
+
+# Setup enhanced logging
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+JSON_LOGS = os.getenv("JSON_LOGS", "false").lower() == "true"
+setup_logging(log_level=LOG_LEVEL, json_format=JSON_LOGS)
+
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
@@ -34,6 +43,9 @@ app = FastAPI(
     description="MLOps API for predicting heart disease risk",
     version="1.0.0"
 )
+
+# Add metrics middleware
+app.add_middleware(MetricsMiddleware)
 
 # Global model loader (loaded on startup)
 model_loader = None
@@ -98,10 +110,12 @@ async def load_model():
         logger.info("Loading model on startup...")
         model_loader = load_best_model()
         logger.info("Model loaded successfully")
+        update_model_status(loaded=True)
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
         logger.warning("API will start without model. Train models first using: python src/models/train.py")
         model_loader = None
+        update_model_status(loaded=False)
         # Don't raise - allow API to start, health check will indicate status
 
 
@@ -114,6 +128,7 @@ async def root():
         "endpoints": {
             "health": "/health",
             "predict": "/predict",
+            "metrics": "/metrics",
             "docs": "/docs"
         }
     }
@@ -159,6 +174,12 @@ async def predict(input_data: HeartDiseaseInput):
         # Make prediction
         result = model_loader.predict_single(**input_dict)
         
+        # Record metrics
+        record_prediction(
+            prediction_label=result['prediction_label'],
+            probability=result['probability']
+        )
+        
         # Log prediction
         logger.info(
             f"Prediction made: {result['prediction_label']} "
@@ -195,6 +216,13 @@ async def predict_batch(inputs: List[HeartDiseaseInput]):
         for input_data in inputs:
             input_dict = input_data.dict()
             result = model_loader.predict_single(**input_dict)
+            
+            # Record metrics for each prediction
+            record_prediction(
+                prediction_label=result['prediction_label'],
+                probability=result['probability']
+            )
+            
             results.append(result)
         
         logger.info(f"Batch prediction completed: {len(results)} predictions")
@@ -210,6 +238,19 @@ async def predict_batch(inputs: List[HeartDiseaseInput]):
             status_code=500,
             detail=f"Batch prediction failed: {str(e)}"
         )
+
+
+@app.get("/metrics", tags=["Monitoring"])
+async def metrics():
+    """
+    Prometheus metrics endpoint.
+    
+    Returns metrics in Prometheus text format.
+    """
+    return Response(
+        content=get_metrics(),
+        media_type=CONTENT_TYPE_LATEST
+    )
 
 
 @app.get("/model/info", tags=["Model"])
